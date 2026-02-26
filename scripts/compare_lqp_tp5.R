@@ -1,10 +1,13 @@
 library(tidyverse)
-library(rethinking)
 library(cmdstanr)
+library(posterior)
+library(bayesplot)
+library(shinystan)
 library(readxl)
+library(rethinking)
 
 # import data
-df <- read_xlsx("data/liquid_plasma_data.xlsx", na = "NA")
+df <- read_xlsx("data/liquid_plasma_data_updated.xlsx", na = "NA")
 
 df_results <- tibble(factor = c("fibrinogen", "protein c", "protein s", "factor v", "factor vii", "factor viii"),
                      mean = NULL,
@@ -27,6 +30,7 @@ df_fibrinogen_compare <- df |>
 mod_compare_fibrinogen <- cmdstan_model("stan/compare_fibrinogen.stan")
 
 data_list_compare_fibrinogen <- list(
+  N = length(df_fibrinogen_compare$fibrinogen),
   fibrinogen = df_fibrinogen_compare$fibrinogen,
   product = df_fibrinogen_compare$product
 )
@@ -67,6 +71,7 @@ df_prc_compare <- df |>
 mod_compare_prc <- cmdstan_model("stan/compare_prc.stan")
 
 data_list_compare_prc <- list(
+  N = length(df_prc_compare$prc),
   prc = df_prc_compare$prc,
   product = df_prc_compare$product
 )
@@ -106,6 +111,7 @@ df_prs_compare <- df |>
 mod_compare_prs <- cmdstan_model("stan/compare_prs.stan")
 
 data_list_compare_prs <- list(
+  N = length(df_prs_compare$prs),
   prs = df_prs_compare$prs,
   product = df_prs_compare$product
 )
@@ -134,7 +140,8 @@ df_results[3, "CI_hi"] <- df_post[rownames(df_post) == "mu_diff", "97.5%"]
 
 # filter for factor v data
 df_fv_compare <- df |>
-  filter(factor == "factor v") |>
+  filter(factor == "factor v",
+         product == "liquid plasma" | (product == "thawed plasma" & sample_source == "bag")) |>
   select(sample_id, product, day, factor, value) |>
   filter(day == 26 | day == 5) |>
   pivot_wider(names_from = factor, values_from = value) |>
@@ -145,6 +152,7 @@ df_fv_compare <- df |>
 mod_compare_fv <- cmdstan_model("stan/compare_fv.stan")
 
 data_list_compare_fv <- list(
+  N = length(df_fv_compare$fv),
   fv = df_fv_compare$fv,
   product = df_fv_compare$product
 )
@@ -184,6 +192,7 @@ df_fvii_compare <- df |>
 mod_compare_fvii <- cmdstan_model("stan/compare_fvii.stan")
 
 data_list_compare_fvii <- list(
+  N = length(df_fvii_compare$fvii),
   fvii = df_fvii_compare$fvii,
   product = df_fvii_compare$product
 )
@@ -228,6 +237,7 @@ df_fviii_compare <- df |>
 mod_compare_fviii <- cmdstan_model("stan/compare_fviii.stan")
 
 data_list_compare_fviii <- list(
+  N = length(df_fviii_compare$fviii),
   fviii = df_fviii_compare$fviii,
   product = df_fviii_compare$product
 )
@@ -259,6 +269,11 @@ df_frequentist <- bind_rows(
   t.test(fviii ~ product, data = df_fviii_compare)  |> broom::tidy()
 )
 
-
-print(df_results)
-print(df_frequentist)
+df_mannwhitney <- bind_rows(
+  wilcox.test(fibrinogen ~ product, data = df_fibrinogen_compare, conf.int = TRUE) |> broom::tidy(),
+  wilcox.test(prc ~ product, data = df_prc_compare, conf.int = TRUE) |> broom::tidy(),
+  wilcox.test(prs ~ product, data = df_prs_compare, conf.int = TRUE) |> broom::tidy(),
+  wilcox.test(fv ~ product, data = df_fv_compare, conf.int = TRUE) |> broom::tidy(),
+  wilcox.test(fvii ~ product, data = df_fvii_compare, conf.int = TRUE) |> broom::tidy(),
+  wilcox.test(fviii ~ product, data = df_fviii_compare, conf.int = TRUE)  |> broom::tidy()
+)
