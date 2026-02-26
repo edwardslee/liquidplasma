@@ -1,0 +1,145 @@
+﻿sample,bag,source,factor,value
+A_seg,A,seg,Factor V,12.4
+A_seg,A,seg,Factor VII,136.8
+A_seg,A,seg,Factor VIII,26.1
+A_seg,A,seg,Protein C,159
+A_seg,A,seg,Protein S,0.2
+A_seg,A,seg,Fibrinogen,213
+A_bag,A,bag,Factor V,45.2
+A_bag,A,bag,Factor VII,141.7
+A_bag,A,bag,Factor VIII,40.6
+A_bag,A,bag,Protein C,161
+A_bag,A,bag,Protein S,0.2
+A_bag,A,bag,Fibrinogen,243
+B_seg,B,seg,Factor V,55.3
+B_seg,B,seg,Factor VII,51.7
+B_seg,B,seg,Factor VIII,65.4
+B_seg,B,seg,Protein C,108
+B_seg,B,seg,Protein S,82
+B_seg,B,seg,Fibrinogen,247
+B_bag,B,bag,Factor V,70.9
+B_bag,B,bag,Factor VII,55.1
+B_bag,B,bag,Factor VIII,78.5
+B_bag,B,bag,Protein C,111
+B_bag,B,bag,Protein S,104.5
+B_bag,B,bag,Fibrinogen,275
+C_seg,C,seg,Factor V,46
+C_seg,C,seg,Factor VII,50.9
+C_seg,C,seg,Factor VIII,54.5
+C_seg,C,seg,Protein C,98
+C_seg,C,seg,Protein S,71.8
+C_seg,C,seg,Fibrinogen,250
+C_bag,C,bag,Factor V,72.9
+C_bag,C,bag,Factor VII,49.8
+C_bag,C,bag,Factor VIII,55.4
+C_bag,C,bag,Protein C,102
+C_bag,C,bag,Protein S,70.8
+C_bag,C,bag,Fibrinogen,258
+D_seg,D,seg,Factor V,68
+D_seg,D,seg,Factor VII,290.3
+D_seg,D,seg,Factor VIII,70.1
+D_seg,D,seg,Protein C,95
+D_seg,D,seg,Protein S,0.2
+D_seg,D,seg,Fibrinogen,458
+D_bag,D,bag,Factor V,106
+D_bag,D,bag,Factor VII,69.1
+D_bag,D,bag,Factor VIII,76.1
+D_bag,D,bag,Protein C,83
+D_bag,D,bag,Protein S,48.6
+D_bag,D,bag,Fibrinogen,531
+E_seg,E,seg,Factor V,80.1
+E_seg,E,seg,Factor VII,48
+E_seg,E,seg,Factor VIII,69.8
+E_seg,E,seg,Protein C,103
+E_seg,E,seg,Protein S,24.9
+E_seg,E,seg,Fibrinogen,354
+E_bag,E,bag,Factor V,93.3
+E_bag,E,bag,Factor VII,47.5
+E_bag,E,bag,Factor VIII,71
+E_bag,E,bag,Protein C,109
+E_bag,E,bag,Protein S,19.7
+E_bag,E,bag,Fibrinogen,363
+F_seg,F,seg,Factor V,46.6
+F_seg,F,seg,Factor VII,58.9
+F_seg,F,seg,Factor VIII,89.3
+F_seg,F,seg,Protein C,100
+F_seg,F,seg,Protein S,88.9
+F_seg,F,seg,Fibrinogen,213
+F_bag,F,bag,Factor V,65
+F_bag,F,bag,Factor VII,58.9
+F_bag,F,bag,Factor VIII,95.1
+F_bag,F,bag,Protein C,102
+F_bag,F,bag,Protein S,105.8
+F_bag,F,bag,Fibrinogen,226
+G_seg,G,seg,Factor V,38.00
+G_seg,G,seg,Factor VII,26.70
+G_seg,G,seg,Factor VIII,45.30
+G_seg,G,seg,Protein C,72.00
+G_seg,G,seg,Protein S,27.40
+G_seg,G,seg,Fibrinogen,250.00
+G_bag,G,bag,Factor V,12.90
+G_bag,G,bag,Factor VII,106.60
+G_bag,G,bag,Factor VIII,32.60
+G_bag,G,bag,Protein C,81.00
+G_bag,G,bag,Protein S,9.10
+G_bag,G,bag,Fibrinogen,183.00
+H_seg,H,seg,Factor V,61.80
+H_seg,H,seg,Factor VII,57.70
+H_seg,H,seg,Factor VIII,31.20
+H_seg,H,seg,Protein C,86.00
+H_seg,H,seg,Protein S,38.40
+H_seg,H,seg,Fibrinogen,250.00
+H_bag,H,bag,Factor V,NA
+H_bag,H,bag,Factor VII,346.60
+H_bag,H,bag,Factor VIII,28.40
+H_bag,H,bag,Protein C,110.00
+H_bag,H,bag,Protein S,0.20
+H_bag,H,bag,Fibrinogen,206.00
+I_seg,I,seg,Factor V,NA
+I_seg,I,seg,Factor VII,NA
+I_seg,I,seg,Factor VIII,71.70
+I_seg,I,seg,Protein C,115.00
+I_seg,I,seg,Protein S,105.70
+I_seg,I,seg,Fibrinogen,311.00
+I_bag,I,bag,Factor V,73.90
+I_bag,I,bag,Factor VII,90.80
+I_bag,I,bag,Factor VIII,82.10
+I_bag,I,bag,Protein C,111.00
+I_bag,I,bag,Protein S,75.50
+I_bag,I,bag,Fibrinogen,267.00
+J_seg,J,seg,Factor V,59.70
+J_seg,J,seg,Factor VII,62.80
+J_seg,J,seg,Factor VIII,65.90
+J_seg,J,seg,Protein C,103.00
+J_seg,J,seg,Protein S,22.50
+J_seg,J,seg,Fibrinogen,311.00
+J_bag,J,bag,Factor V,29.50
+J_bag,J,bag,Factor VII,59.70
+J_bag,J,bag,Factor VIII,46.00
+J_bag,J,bag,Protein C,104.00
+J_bag,J,bag,Protein S,43.30
+J_bag,J,bag,Fibrinogen,280.00
+K_seg,K,seg,Factor V,40.70
+K_seg,K,seg,Factor VII,37.00
+K_seg,K,seg,Factor VIII,70.20
+K_seg,K,seg,Protein C,74.00
+K_seg,K,seg,Protein S,33.80
+K_seg,K,seg,Fibrinogen,197.00
+K_bag,K,bag,Factor V,80.00
+K_bag,K,bag,Factor VII,37.10
+K_bag,K,bag,Factor VIII,72.50
+K_bag,K,bag,Protein C,75.00
+K_bag,K,bag,Protein S,55.60
+K_bag,K,bag,Fibrinogen,213.00
+L_seg,L,seg,Factor V,82.30
+L_seg,L,seg,Factor VII,65.00
+L_seg,L,seg,Factor VIII,60.70
+L_seg,L,seg,Protein C,108.00
+L_seg,L,seg,Protein S,68.40
+L_seg,L,seg,Fibrinogen,186.00
+L_bag,L,bag,Factor V,63.80
+L_bag,L,bag,Factor VII,62.10
+L_bag,L,bag,Factor VIII,58.20
+L_bag,L,bag,Protein C,110.00
+L_bag,L,bag,Protein S,98.30
+L_bag,L,bag,Fibrinogen,194.00
