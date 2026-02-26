@@ -1,10 +1,12 @@
 library(tidyverse)
 library(rethinking)
 library(cmdstanr)
+library(posterior)
+library(bayesplot)
+library(shinystan)
 library(readxl)
 
-df <- read_xlsx("data/liquid_plasma_data.xlsx", na = "NA")
-
+df <- read_xlsx("data/liquid_plasma_data_updated.xlsx", na = "NA")
 
 df_results <- tibble(factor = rep(c('fibrinogen',
                                     'protein c',
@@ -173,9 +175,11 @@ df_lp <- df |>
          factor == "factor v") |>
   select(sample_id, day, factor, value) |>
   mutate(day = day - 15) |>
+  filter(day != 0) |>
   pivot_wider(names_from = factor, values_from = value) |>
   rename(time = day,
-         factor_v = `factor v`)
+         factor_v = `factor v`) |>
+  mutate(sample_id = as.factor(sample_id))
 
 data_list <- list(
   factor_v = df_lp$factor_v,
@@ -185,7 +189,8 @@ data_list <- list(
 
 
 # piecewise regression with breakpoint at day of expiration
-mod_fv <- cmdstan_model("stan/factorv_piecewise_regression.stan")
+# mod_fv <- cmdstan_model("stan/factorv_piecewise_regression.stan")
+mod_fv <- cmdstan_model("stan/factorv_regression.stan")
 
 fit_fv_pw <- mod_fv$sample(
   data = data_list,
@@ -195,13 +200,13 @@ fit_fv_pw <- mod_fv$sample(
   iter_sampling = 5000,
   parallel_chains = 4,
   refresh = 500,
-  adapt_delta = 0.95
+  adapt_delta = 0.99
 )
 
 df_post_fv <- precis(fit_fv_pw, prob = 0.95) |> as.data.frame()
-df_results[7, "mean"]  <- df_post_fv[rownames(df_post_fv) == "beta1_bar", "mean"]
-df_results[7, "ci_lo"] <- df_post_fv[rownames(df_post_fv) == "beta1_bar", "2.5%"]
-df_results[7, "ci_hi"] <- df_post_fv[rownames(df_post_fv) == "beta1_bar", "97.5%"]
+# df_results[7, "mean"]  <- df_post_fv[rownames(df_post_fv) == "beta1_bar", "mean"]
+# df_results[7, "ci_lo"] <- df_post_fv[rownames(df_post_fv) == "beta1_bar", "2.5%"]
+# df_results[7, "ci_hi"] <- df_post_fv[rownames(df_post_fv) == "beta1_bar", "97.5%"]
 
 df_results[8, "mean"]  <- df_post_fv[rownames(df_post_fv) == "beta2_bar", "mean"]
 df_results[8, "ci_lo"] <- df_post_fv[rownames(df_post_fv) == "beta2_bar", "2.5%"]
@@ -400,11 +405,28 @@ p_prs
 
 
 # factor v
-draws_array_fv <- fit_fv_pw$draws(variables = c("beta1_bar", "beta2_bar", "sigma_b1", "sigma_b2", "alpha", "sigma"))
+# draws_array_fv <- fit_fv_pw$draws(variables = c("beta1_bar", "beta2_bar", "sigma_b1", "sigma_b2", "alpha", "sigma"))
+posterior_means_fv <- function(draws_array, time) {
+  df_factor <- tibble(time = time)
+  beta2_bar <- draws_array[, , "beta2_bar"] |> as.vector()
+  sigma_b2 <- draws_array[, , "sigma_b2"] |> as.vector()
+  alpha <- draws_array[, , "alpha"] |> as.vector()
+  sigma <- draws_array[, , "sigma"] |> as.vector()
+  
+  df_factor <- df_factor |> mutate(
+    factor_avg = purrr::map(time, function(x) {alpha + beta2_bar * (x - 11)}),
+    mean_factor = map_dbl(factor_avg, function(x) mean(x)),
+    ci_lo = map_dbl(factor_avg, function(x) quantile(x, probs = c(0.025))),
+    ci_hi = map_dbl(factor_avg, function(x) quantile(x, probs = c(0.975)))
+  )
+  
+  df_factor |> select(-factor_avg) |> mutate(time = time + 15)
+}
 
-df_factor_fv <- posterior_means(draws_array_fv, time) 
+draws_array_fv <- fit_fv_pw$draws(variables = c("beta2_bar", "sigma_b2", "alpha", "sigma"))
+df_factor_fv <- posterior_means_fv(draws_array_fv, time[time >= 11]) 
 p_fv <- df |>
-  filter(factor == "factor v", product == "liquid plasma") |>
+  filter(factor == "factor v", product == "liquid plasma", day >= 26) |>
   ggplot() +
   geom_ribbon(aes(time, ymin = ci_lo, ymax = ci_hi), data = df_factor_fv, alpha = 0.3) +
   geom_jitter(aes(day, value), width = width_level, height = 0, alpha = alpha_level, stroke = NA, size = size_level) +
@@ -493,6 +515,7 @@ ggsave(filename = "figures/fig1b1.pdf", plot = fig_b, device = "pdf", colormodel
 width_size <- 0.2
 
 fig_a <- df |> 
+  filter(!(product == "thawed plasma" & factor == "factor v" & sample_source == "segment")) |>
   mutate(factor = factor(factor, levels = c("fibrinogen", "protein c", "protein s", "factor v", "factor vii", "factor viii"))) |>
   mutate(product_label = ifelse(product == "liquid plasma", "LQP", "TP"),
          product_label = paste0(product_label, day),
@@ -507,3 +530,45 @@ fig_a <- df |>
 
 ggsave(filename = "figures/fig1a1.pdf", plot = fig_a, device = "pdf", colormodel = "cmyk",
        width = 6.3, height = 4, units = "in")
+
+
+
+
+# posteriors
+post_fibrinogen <- fit_fibrinogen_pw$draws()
+mcmc_areas(post_fibrinogen, pars = c("beta1_bar", "beta2_bar"),
+           prob = 0.8,
+           prob_outer = 0.95)
+
+mcmc_intervals(post_fibrinogen, pars = c("beta1_bar", "beta2_bar"),
+               prob = 0.8,
+               prob_outer = 0.95) + theme_light()
+
+
+post_fv <- fit_fv_pw$draws()
+mcmc_areas(post_fv, pars = c("beta1_bar", "beta2_bar"),
+           prob = 0.95,
+           prob_outer = 0.99)
+
+mcmc_intervals(post_fv, pars = c("beta1_bar", "beta2_bar"),
+               prob = 0.95,
+               prob_outer = 0.99)
+
+post_fvii <- fit_fvii_pw$draws()
+mcmc_areas(post_fvii, pars = c("beta1_bar", "beta2_bar"),
+           prob = 0.95,
+           prob_outer = 0.99)
+
+mcmc_intervals(post_fvii, pars = c("beta1_bar", "beta2_bar"),
+           prob = 0.89,
+           prob_outer = 0.95)
+
+post_fviii <- fit_fviii_pw$draws()
+mcmc_areas(post_fviii, pars = c("beta1_bar", "beta2_bar"),
+           prob = 0.95,
+           prob_outer = 0.99)
+
+mcmc_intervals(post_fviii, pars = c("beta1_bar", "beta2_bar"),
+               prob = 0.89,
+               prob_outer = 0.95)
+
