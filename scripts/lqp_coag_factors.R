@@ -1,11 +1,13 @@
 library(tidyverse)
 library(rethinking)
 library(cmdstanr)
+library(posterior)
+library(bayesplot)
+library(shinystan)
 library(readxl)
 
 # import data
-df <- read_xlsx("data/liquid_plasma_data.xlsx", na = "NA")
-
+df <- read_xlsx("data/liquid_plasma_data_updated.xlsx", na = "NA")
 
 df_results <- tibble(factor = rep(c('fibrinogen',
                                     'protein c',
@@ -179,7 +181,7 @@ fit_prs_15 <- ulam(
 fit_prs_26 <- ulam(
   alist(
     prs ~ dstudent(2, mu, sigma),
-    mu ~ dnorm(100, 20),
+    mu ~ dnorm(80, 20),
     sigma ~ dexp(1)
   ),
   data = df_prs_26, chains = 4, log_lik = TRUE, iter = 10000, cores = 2
@@ -190,7 +192,7 @@ fit_prs_26 <- ulam(
 fit_prs_27 <- ulam(
   alist(
     prs ~ dstudent(2, mu, sigma),
-    mu ~ dnorm(100, 20),
+    mu ~ dnorm(80, 20),
     sigma ~ dexp(1)
   ),
   data = df_prs_27, chains = 4, log_lik = TRUE, iter = 10000, cores = 2
@@ -411,14 +413,14 @@ df_results[18, "ci_hi"] <- df_post[rownames(df_post) == "mu", "97.5%"]
 #--------------------
 #    thawed plasma
 df_fibrinogen_tp <- df |>
-  filter(product == "thawed_plasma",
+  filter(product == "thawed plasma",
          factor == "fibrinogen") |>
   select(sample_id, day, factor, value) |>
   pivot_wider(names_from = factor, values_from = value) |>
   rename(time = day)
 
 df_prc_tp <- df |>
-  filter(product == "thawed_plasma",
+  filter(product == "thawed plasma",
          factor == "protein c") |>
   select(sample_id, day, factor, value) |>
   pivot_wider(names_from = factor, values_from = value) |>
@@ -426,7 +428,7 @@ df_prc_tp <- df |>
          prc = `protein c`)
 
 df_prs_tp <- df |>
-  filter(product == "thawed_plasma",
+  filter(product == "thawed plasma",
          factor == "protein s") |>
   select(sample_id, day, factor, value) |>
   pivot_wider(names_from = factor, values_from = value) |>
@@ -434,15 +436,16 @@ df_prs_tp <- df |>
          prs = `protein s`)
 
 df_fv_tp <- df |>
-  filter(product == "thawed_plasma",
-         factor == "factor v") |>
+  filter(product == "thawed plasma",
+         factor == "factor v",
+         sample_source == "bag") |>
   select(sample_id, day, factor, value) |>
   pivot_wider(names_from = factor, values_from = value) |>
   rename(time = day,
          fv = `factor v`)
 
 df_fvii_tp <- df |>
-  filter(product == "thawed_plasma",
+  filter(product == "thawed plasma",
          factor == "factor vii") |>
   select(sample_id, day, factor, value) |>
   pivot_wider(names_from = factor, values_from = value) |>
@@ -450,7 +453,7 @@ df_fvii_tp <- df |>
          fvii = `factor vii`)
 
 df_fviii_tp <- df |>
-  filter(product == "thawed_plasma",
+  filter(product == "thawed plasma",
          factor == "factor viii") |>
   select(sample_id, day, factor, value) |>
   pivot_wider(names_from = factor, values_from = value) |>
@@ -584,5 +587,22 @@ df_results <- bind_rows(df_results,
                         )
 )
 
-# posterior summaries with posterior means and 95% credible intervals
-print(df_results)
+
+
+
+#------------------
+#      plotting
+df_lp <- df |>
+  filter(product == "liquid plasma",
+         day != 27) |>
+  rename(time = day)
+
+ggplot(df_lp) +
+  geom_jitter(aes(as.factor(time), value), width = 0.2, height = 0) +
+  geom_point(aes(as.factor(time), mean), data = df_results, color = "red") + 
+  geom_linerange(aes(x = as.factor(time), ymin = ci_lo, ymax = ci_hi), data = df_results) +
+  facet_wrap(~factor, scales = "free") +
+  coord_cartesian(ylim = c(0, NA)) +
+  theme_light() +
+  xlab("Day of Storage") +
+  ylab("Activity Level (%)")
