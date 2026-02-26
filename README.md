@@ -9,9 +9,11 @@ thawed plasma (on day 5).
 
 ## Data
 
-The data set is included in the `figures` folder. It is provided in both
-.xlsx and .rds formats for Excel and R users respectively. The data has
-the following columns:
+Two data sets are included in the `figures` folder. The main data set
+has factory activities for liquid plasma and thawed plasma units and is
+in files named `liquid_plasma_data_updated.xlsx` and
+`liquid_plasma.rds`. We provide the data in both .xlsx and .rds formats
+for Excel and R users respectively. The data have the following columns:
 
 -   `sample_id`: IDs of the plasma units used;
 -   `product`: describes if the plasma unit is either “liquid plasma” or
@@ -21,7 +23,20 @@ the following columns:
 -   `factor`: which factor was measured
 -   `value`: the activity measurement; fibrinogen has the units mg/dL,
     and the others have the units %
+-   `abo`: the ABO type of the donor for the unit
 -   `comments`: any relevant comments regarding the measurements
+
+The second data set is called `liquid_correlation.csv` and contains the
+data for the analysis that compared measured factor activities in
+segments vs main bags. The data have the following columns:
+
+-   `sample`: IDs of the samples used. `_seg` represents segments of the
+    unit, and `_bag` represents the main bag of the unit.
+-   `bag`: ID of the plasma unit used.
+-   `source`: indicates whether the sample is from a segment or a bag
+-   `factor`: which factor was measured
+-   `value`: the activity measurement; fibrinogen has the units mg/dL,
+    and the others have the units %
 
 ## Code
 
@@ -40,6 +55,9 @@ The following scripts implement the various parts of the analysis:
     analysis
 -   `student-t-analysis.R` contains the analysis of comparing a fixed nu
     vs a free nu when fitting the Student-t likelihoods
+-   `segment_correlation.R` contains the analysis for the comparison of
+    activities in segments and in their corresponding bags and
+    quantifying the correlation between them.
 
 Running the code requires installation of `tidyverse`, `rethinking`,
 `cmdstanr`, and `readxl` packages, which can be installed by running the
